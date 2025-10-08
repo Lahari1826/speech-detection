@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎤 Speech Emotion Recognition</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f6fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            color: #2f3640;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        form {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        input[type="file"] {
+            padding: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #273c75;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #40739e;
+        }
+
+        #result {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .processing {
+            color: #718093;
+            font-style: italic;
+        }
+
+        .success {
+            color: #44bd32;
+        }
+
+        .error {
+            color: #e84118;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎤 Speech Emotion Recognition</h1>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="audio" accept=".wav" required>
+        <button type="submit">Predict Emotion</button>
+    </form>
+
+    <h2 id="result"></h2>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const result = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            result.textContent = "Analyzing audio...";
+            result.className = "processing";
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    result.textContent = `Predicted Emotion: ${data.emotion}`;
+                    result.className = "success";
+                } else {
+                    result.textContent = `Error: ${data.error}`;
+                    result.className = "error";
+                }
+            } catch (err) {
+                result.textContent = `Error: ${err}`;
+                result.className = "error";
+            }
+        });
+    </script>
+
+</body>
+</html>
